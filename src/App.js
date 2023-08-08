@@ -1,15 +1,14 @@
-
-import { v4 } from "uuid";
-import { useState } from "react";
-import BookCard from "./components/BookCard";
-import DeleteModal from "./components/DeleteModal";
-import EditModal from "./components/editModal";
-
+import { v4 } from 'uuid';
+import { useState } from 'react';
+import BookCard from './components/BookCard';
+import DeleteModal from './components/DeleteModal';
+import EditModal from './components/EditModal';
+import { toast } from 'react-toastify';
 
 function App() {
   // kitap state'leri
   const [books, setBooks] = useState([]);
-  const [bookName, setBookName] = useState("");
+  const [bookName, setBookName] = useState('');
   const [inputError, setInputError] = useState(false);
   // modal state'leri
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -17,106 +16,123 @@ function App() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editItem, setEditItem] = useState(null);
 
-  // inputtaki değişimi izleme
+  // inputtaki değimi izler
   const handleChange = (e) => {
     // kitap ismi state'ini güncelle
     setBookName(e.target.value);
   };
 
-  // formun gönderilme olayını izleme
+  // formun gönderilme olayını izler
   const handleSubmit = (e) => {
     e.preventDefault();
 
-  
+    if (!bookName) {
+      toast.warn('Lütfen Kitap İsmi Giriniz', { autoClose: 2000 });
+      return;
+    }
 
-    // kitabı saklamak için gerekli verilere sahip obje oluşturma
+    // kitabı  için gerekleri verileri sahip obje oluşturma
     const newBook = {
       id: v4(),
       title: bookName,
-      date: new Date().toLocaleDateString(),
+      date: new Date().toLocaleString(),
       isRead: false,
     };
 
-    // oluşturulan kitap objesini kitaplar dizisine eklemek için spread operatörünü kullanarak önceden eklenen elemanları koru
+    // oluşturulan kitap objesinin kitaplar dizisine aktar
+    // spread operator kullanrak öncdene eklenen elemanları muhafaza et
     setBooks([...books, newBook]);
 
     // eleman eklenince inputu sıfırla
-    setBookName("");
+    setBookName('');
+
+    // bildirim ver
+    toast.success('Kitap Başarıyla Eklendi', {
+      autoClose: 2000,
+    });
   };
 
-  // silinince modal açma işlemini yapar
+  // silinmede modal açma işlemini yapar
   const handleModal = (id) => {
-    // id'yi state'e aktar
+    //  id'yi state'e aktar
     setDeleteId(id);
-    // modalı aç
+    // modalı ekrana bas
     setShowDeleteModal(true);
   };
 
   // silme işlemini yapar
   const handleDelete = () => {
-    // silinecek id'ye eşit olmayanları al ve bir diziye aktar
-    const filtered = books.filter((book) => book.id !== deleteId);
+    // silincek id'ye eşit olmayanları al ve bir diziye aktar
+    const filred = books.filter((book) => book.id !== deleteId);
+
     // state'i güncelleme
-    setBooks(filtered);
+    setBooks(filred);
 
-    // modalı kapat
+    // modal'ı kapat
     setShowDeleteModal(false);
+
+    // bildirim ver
+    toast.error('Kitap Başarıyla Silindi', {
+      autoClose: 2000,
+    });
   };
 
-  // okundu butonuna tıklanınca çalışır
+  // Okundu butonuna tıklanılınca çalışır
   const handleRead = (book) => {
-  //  okundu değerini tersine çevirme
-  const updateBook = {...book, isRead: !book.isRead};
- 
-    // dizideki güncellenecek elemanın dizideki sırasını bulma
-    const index = books.findIndex(
-      (item) => item.id === book.id);
+    // objenin okundu değerini terine çevir
+    const updatedBook = { ...book, isRead: !book.isRead };
 
-      // book dizisinin kopyasını oluştur
-      const cloneBooks = [...books];
+    // güncellenicek elmanın dizideki sırasını bulma
+    const index = books.findIndex((item) => item.id === book.id);
 
-      // dizinin kopyasında gerekli elemanı güncelle
-      cloneBooks[index] = updateBook;
-      
-      // state'i güncelle
-      setBooks(cloneBooks);
+    // books dizinin kopyasını oluştur
+    const cloneBooks = [...books];
+
+    // dizinin kopyasında gerekli elemanı güncelle
+    cloneBooks[index] = updatedBook;
+
+    // state'i güncelle
+    setBooks(cloneBooks);
   };
 
-// düzenle modalı işlemleri
-const handleEditModal = (book) => {
-  // düzenlenecek modalı state aktar
-  setEditItem(book);
+  // edit modal'ı işlemleri
+  const handleEditModal = (book) => {
+    // düznleecek elemanı state aktar
+    setEditItem(book);
 
-  // modalı aç
-  setShowEditModal(true);
-};
+    // modal'ı aç
+    setShowEditModal(true);
+  };
 
-// kitabı güncelleme
-const handleEditBook = () => {
-  // sırasını bulma
-  const index = books.findIndex((book) => book.id === editItem.id);
+  // kitabı günceller
+  const handleEditBook = () => {
+    // sırasını bulma
+    const index = books.findIndex((book) => book.id === editItem.id);
 
-  // statein kopyasınıo oluştur
-  const cloneBooks = [...books];
+    // state'in kopyasını oluştur
+    const cloneBooks = [...books];
 
-  // eski kitabı diziden çıkart yerine yenisini koy,
-  cloneBooks.splice(index,1,editItem);
+    // eski kitabı diziden çıkart yerine yenisini koy
+    cloneBooks.splice(index, 1, editItem);
 
-  // statei güncelle
-  setBooks(cloneBooks);
+    // state'i güncelle
+    setBooks(cloneBooks);
 
-  // modalı kapat
-  setShowEditModal(false);
-};
-// kaydet kısmında hatan var ona bak  02.29
+    // modal'ı kapat
+    setShowEditModal(false);
+
+    // bildirim ver
+    toast.info('Kitap Güncellendi', {
+      autoClose: 2000,
+    });
+  };
 
   return (
     <div>
-      <header className="bg-dark text-light py-3 fs-5 text-center">
+      <header className="bg-dark text-light py-3 fs-5  text-center">
         <h1>Kitap Kurdu</h1>
       </header>
-
-      {/* form alanı */}
+      {/* form */}
       <div className="container">
         {/* hata bildirimini ekrana basma */}
         {inputError && (
@@ -125,7 +141,7 @@ const handleEditBook = () => {
 
         <form onSubmit={handleSubmit} className="d-flex gap-3 mt-4">
           <input
-            placeholder="Bir Kitap İsmi Giriniz"
+            placeholder="Bir kitap ismi giriniz..."
             onChange={handleChange}
             value={bookName}
             className="form-control shadow"
@@ -134,31 +150,41 @@ const handleEditBook = () => {
           <button className="btn btn-warning shadow">Ekle</button>
         </form>
 
-        {/* eğer state içerisi boş ise ekrana bunu yaz */}
-        {books.length === 0 && <h4>Henüz herhangi bir kitap eklenmedi</h4>}
+        {/* eğer state içerisi boş ise ekran bunu yaz */}
+        {books.length === 0 && (
+          <h4>Henüz herhangi bir kitap eklenmedi</h4>
+        )}
 
-        {/* eğer state içerisinde en az 1 eleman varsa ekrana bunu yaz */}
+        {/* eğer state içerisinde en az bir eleman varsa ekrana yaz */}
         {books.map((book) => (
-          <BookCard key={book.id} book={book} handleModal={handleModal} handleRead={handleRead} handleEditModal={handleEditModal} />
+          <BookCard
+            key={book.id}
+            book={book}
+            handleModal={handleModal}
+            handleRead={handleRead}
+            handleEditModal={handleEditModal}
+          />
         ))}
       </div>
 
-      {/* modallar */}
+      {/* Modallar */}
       {showDeleteModal && (
         <DeleteModal
           handleDelete={handleDelete}
-          handleModal={handleModal}
           setShowDeleteModal={setShowDeleteModal}
-          handleEditBook={handleEditBook}
         />
       )}
 
-      
-        {showEditModal && ( <EditModal editItem = {editItem} setEditItem = {setEditItem} setShowEditModal={setShowEditModal}/>
+      {showEditModal && (
+        <EditModal
+          editItem={editItem}
+          setEditItem={setEditItem}
+          setShowEditModal={setShowEditModal}
+          handleEditBook={handleEditBook}
+        />
       )}
     </div>
   );
 }
 
 export default App;
-

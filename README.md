@@ -46,3 +46,4 @@ oluştur oku düzenle sil
 --- kaydet butonu: 'handleEditBook' fonk. çalıştırsın
 --çalışan fonk. kitaplar dizisini güncellesin (eski elemanı çıkarıp güncel halini koymalı)
 --güncellerken isim ve date bilgilerini değişir# crud_app
+# crud_App
